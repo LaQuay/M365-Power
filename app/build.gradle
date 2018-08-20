@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '27.0.3'
 
     defaultConfig {
-        applicationId "maisi.M365.power"
+        applicationId "laquay.M365.dashboard"
         minSdkVersion 24
-        targetSdkVersion 24
+        targetSdkVersion 27
     }
 
     buildTypes {
@@ -22,16 +22,13 @@ android {
     }
 }
 
+final SUPPORT_LIB_VER = '27.0.2'
 dependencies {
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation 'com.polidea.rxandroidble2:rxandroidble:1.5.0'
-    implementation 'com.github.hotchemi:permissionsdispatcher:3.2.0'
-    //{}
-    // if you don't use android.app.Fragment you can exclude support for them
-    //    exclude module: "support-v13"
-    //}
-    implementation 'com.android.support:support-v4:26.1.0'
-    annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.2.0"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    implementation 'com.android.support:design:27.0.2'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'com.polidea.rxandroidble2:rxandroidble:1.6.0'
+    implementation 'com.github.hotchemi:permissionsdispatcher:3.3.1'
+    annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.3.1"
+    implementation "com.android.support:support-v4:${SUPPORT_LIB_VER}"
+    implementation "com.android.support:design:${SUPPORT_LIB_VER}"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 }

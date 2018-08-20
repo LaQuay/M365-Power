@@ -1,27 +1,15 @@
-M365 Power
+M365 Dashboard - Android
 =====
 
-A little app to display and log data from the Xiaomi M365.
+## Credits
+BLE Protocol for M365 scooter -  Camilo Ruiz (CamiAlfa)
+https://github.com/CamiAlfa/M365-BLE-PROTOCOL
 
-Features:
-* Shows stats like Power (Wattage), Speed, Current, Voltage, Temps, remaining capacity, distance travelled..
-* Calculates some stats like current power consumption in mah/km
-* Tries to estimate the remaining distance according to consumption data
-* Logging of most stats in a csv file
+Java Android Message Builder - Salvador Martín (salvarm)
+https://github.com/salvamr/m365-ble-msg-builder
 
-Todo:
-* Finish and extend settings 
-* Add scooter settings: Regenerative breaking, cruise mode 
-* Add scooter features: Locking, rear light 
-* Make UI customizeable
+Android M365 Power App - (maisi)
+https://github.com/maisi/M365-Power
 
- 
-# Credits
-
-Thanks to Salvador Martín (salvamr) for his msg builder: https://github.com/salvamr/m365-ble-msg-builder
-
-and Camilo Ruiz (CamiAlfa) for his work on the BLE protocol of the scooter: https://github.com/CamiAlfa/M365-BLE-PROTOCOL
-
-# License
-
+## License
 GNU General Public License v3.0 
