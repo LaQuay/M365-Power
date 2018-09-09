@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import laquay.M365.dashboard.main.LogDTO;
-import laquay.M365.dashboard.main.Statistics;
+import laquay.M365.dashboard.lib.LogDTO;
+import laquay.M365.dashboard.lib.Statistics;
 
 public class LogWriter {
     private final char DEFAULT_SEPARATOR = ',';
