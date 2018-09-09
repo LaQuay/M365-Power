@@ -37,13 +37,12 @@ public class VoltageRequest implements IRequest {
     @Override
     public String handleResponse(String[] request) {
         String temp = request[7] + request[6];
-        int voltage = (short) Integer.parseInt(temp, 16);
-        double v = voltage;
-        v = v / 100;
 
+        int voltage = (short) Integer.parseInt(temp, 16);
+        double v = voltage / 100.0;
         Statistics.setCurrentVoltage(v);
+
         return v + " V";
-        //return textViews;
     }
 
     @Override

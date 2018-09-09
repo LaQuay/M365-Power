@@ -37,10 +37,11 @@ public class AmpereRequest implements IRequest {
     @Override
     public String handleResponse(String[] request) {
         String temp = request[7] + request[6];
+
         int amps = (short) Integer.parseInt(temp, 16);
-        double c = amps;
-        c = c / 100;
+        double c = amps / 100.0;
         Statistics.setCurrentAmpere(c);
+
         return "" + c + " A";
     }
 

@@ -37,8 +37,10 @@ public class BatteryLifeRequest implements IRequest {
     @Override
     public String handleResponse(String[] request) {
         String temp = request[7] + request[6];
+
         int batteryLife = (short) Integer.parseInt(temp, 16);
         Statistics.setBatteryLife(batteryLife);
+
         return batteryLife + " %";
     }
 

@@ -31,36 +31,35 @@ public class SuperBatteryRequest implements IRequest {
 
     @Override
     public String handleResponse(String[] request) {
-        String temp = request[7] + request[6];
-        int remainingCapacity = (short) Integer.parseInt(temp, 16);
+        String tempCapacity = request[7] + request[6];
+        String tempLife = request[9] + request[8];
+        String tempAmpere = request[11] + request[10];
+        String tempVoltage = request[13] + request[12];
+        String tempBat1 = request[14];
+        String tempBat2 = request[15];
+
+        int remainingCapacity = (short) Integer.parseInt(tempCapacity, 16);
         Statistics.setRemainingCapacity(remainingCapacity);
 
-        temp = request[9] + request[8];
-        int batteryLife = (short) Integer.parseInt(temp, 16);
+        int batteryLife = (short) Integer.parseInt(tempLife, 16);
         Statistics.setBatteryLife(batteryLife);
 
-        temp = request[11] + request[10];
-        int amps = (short) Integer.parseInt(temp, 16);
-        double c = amps;
-        c = c / 100;
+        int amps = (short) Integer.parseInt(tempAmpere, 16);
+        double c = amps / 100.0;
         Statistics.setCurrentAmpere(c);
 
-        temp = request[13] + request[12];
-        int voltage = (short) Integer.parseInt(temp, 16);
-        double v = voltage;
-        v = v / 100;
+        int voltage = (short) Integer.parseInt(tempVoltage, 16);
+        double v = voltage / 100;
         Statistics.setCurrentVoltage(v);
 
-        temp = request[14];
-        int battTemp1 = (short) Integer.parseInt(temp, 16);
-        temp = request[15];
-        int battTemp2 = (short) Integer.parseInt(temp, 16);
+        int battTemp1 = (short) Integer.parseInt(tempBat1, 16);
 
+        int battTemp2 = (short) Integer.parseInt(tempBat2, 16);
 
-        int maxBattTemp = Math.max(battTemp1, battTemp2) - 20;
+        int maxBattTemp = Math.max(battTemp1, battTemp2) - 20; // TODO ???
         Statistics.setBatteryTemperature(maxBattTemp);
 
-        return c + " A";
+        return c + " A"; // TODO ???
     }
 
     @Override

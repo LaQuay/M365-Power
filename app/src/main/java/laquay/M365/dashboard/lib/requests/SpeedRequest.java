@@ -39,15 +39,14 @@ public class SpeedRequest implements IRequest {
     @Override
     public String handleResponse(String[] request) {
         String temp = request[7] + request[6];
+
         int speed = (short) Integer.parseInt(temp, 16);
 
-        double v = speed;
-        v = v / 1000;
-        //Log.d("Speed","speed:"+v);
+        double v = speed / 1000.0;
         Statistics.setSpeed(v);
         v = Statistics.round(v, 1);
+
         return v + "";
-        //return textViews;
     }
 
     public long getDelay(TimeUnit timeUnit) {

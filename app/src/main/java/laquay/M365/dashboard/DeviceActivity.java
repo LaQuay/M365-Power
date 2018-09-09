@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v13.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.math.RoundingMode;
@@ -72,8 +72,8 @@ public class DeviceActivity extends AppCompatActivity
     private static double currDiff = 0L;
     private SpecialTextView voltageMeter;
     private SpecialTextView ampMeter;
-    private SpecialTextView life;
-    private SpecialTextView speedMeter;
+    private SpecialTextView batteryLifeTextView;
+    private SpecialTextView currentSpeedTextView;
     private TextView powerMeter;
     private TextView minPowerView;
     private TextView maxPowerView;
@@ -81,7 +81,7 @@ public class DeviceActivity extends AppCompatActivity
     private TextView rangeMeter;
     private TextView recoveredPower;
     private TextView spentPower;
-    private TextView time;
+    private TextView statusTextView;
     private TextView battTemp;
     private TextView distance;
     private TextView capacity;
@@ -104,7 +104,7 @@ public class DeviceActivity extends AppCompatActivity
     private boolean storagePermission = false;
     private boolean handlerStarted = false;
     private static final int PERMISSION_EXTERNAL_STORAGE = 0;
-    private ConstraintLayout mRootView;
+    private LinearLayout mRootView;
 
     private ResponseCallback responseCallback;
     private Menu menu;
@@ -138,13 +138,15 @@ public class DeviceActivity extends AppCompatActivity
             }
         }
     };
-    private Runnable updateSuperRunnable = new Runnable() {
+
+    private Runnable updateSuperMasterRunnable = new Runnable() {
         @Override
         public void run() {
             requestQueue.add(new SuperMasterRequest());
             handler.postDelayed(this, Constants.getSpeedDelay());
         }
     };
+
     private Runnable updateSuperBatteryRunnable = new Runnable() {
         @Override
         public void run() {
@@ -152,13 +154,15 @@ public class DeviceActivity extends AppCompatActivity
             handler.postDelayed(this, Constants.getAmpereDelay());
         }
     };
-    private Runnable getLogsRunnable = new Runnable() {
+
+    private Runnable logsRunnable = new Runnable() {
         @Override
         public void run() {
             logWriter.writeLog(false);
             handler.postDelayed(this, Constants.getLogDelay());
         }
     };
+
     private Runnable runnableMeta = new Runnable() {
         @Override
         public void run() {
@@ -168,10 +172,10 @@ public class DeviceActivity extends AppCompatActivity
 
             if (DeviceManager.getInstance(getBaseContext()).isConnected()) {
                 handler.removeCallbacksAndMessages(null);
-                handler.postDelayed(updateSuperRunnable, Constants.getSpeedDelay());
+                handler.postDelayed(updateSuperMasterRunnable, Constants.getSpeedDelay());
                 handler.postDelayed(updateSuperBatteryRunnable, Constants.getAmpereDelay());
                 if (storagePermission) {
-                    handler.postDelayed(getLogsRunnable, 2000);
+                    handler.postDelayed(logsRunnable, 2000);
                 }
                 handler.postDelayed(this, 10000);
             }
@@ -191,36 +195,35 @@ public class DeviceActivity extends AppCompatActivity
 
         mRootView = findViewById(R.id.root);
 
-        voltageMeter = findViewById(R.id.voltageMeter);
+        voltageMeter = findViewById(R.id.tv_voltage_meter);
         voltageMeter.setType(RequestType.VOLTAGE);
         textViews.add(voltageMeter);
 
-        ampMeter = findViewById(R.id.ampMeter);
+        ampMeter = findViewById(R.id.tv_motor_amp);
         ampMeter.setType(RequestType.AMPERE);
         textViews.add(ampMeter);
 
-        speedMeter = findViewById(R.id.speedMeter);
-        speedMeter.setType(RequestType.SPEED);
-        textViews.add(speedMeter);
+        currentSpeedTextView = findViewById(R.id.tv_current_speed);
+        currentSpeedTextView.setType(RequestType.SPEED);
+        textViews.add(currentSpeedTextView);
 
-        powerMeter = findViewById(R.id.powerMeter);
+        powerMeter = findViewById(R.id.tv_current_power);
         minPowerView = findViewById(R.id.minPowerView);
         maxPowerView = findViewById(R.id.maxPowerView);
         efficiencyMeter = findViewById(R.id.efficiencyMeter);
         rangeMeter = findViewById(R.id.rangeMeter);
         recoveredPower = findViewById(R.id.recoveredPower);
-        startHandlerButton = findViewById(R.id.start_handler_button);
         spentPower = findViewById(R.id.spentPower);
-        battTemp = findViewById(R.id.battTemp);
-        distance = findViewById(R.id.distanceMeter);
-        capacity = findViewById(R.id.remainingAmps);
+        battTemp = findViewById(R.id.tv_battery_temp);
+        distance = findViewById(R.id.tv_distance_meter);
+        capacity = findViewById(R.id.tv_remaining_amps);
         averageEfficiency = findViewById(R.id.AverageEfficiencyMeter);
         averageSpeed = findViewById(R.id.averageSpeedMeter);
-        motorTemp = findViewById(R.id.motorTemp);
-        time = findViewById(R.id.time);
-        life = findViewById(R.id.life);
-        life.setType(RequestType.BATTERYLIFE);
-        textViews.add(life);
+        motorTemp = findViewById(R.id.tv_motor_temperature);
+        statusTextView = findViewById(R.id.tv_status);
+        batteryLifeTextView = findViewById(R.id.tv_battery_life);
+        batteryLifeTextView.setType(RequestType.BATTERYLIFE);
+        textViews.add(batteryLifeTextView);
 
         requestTypes.put(RequestType.VOLTAGE, new VoltageRequest());
         requestTypes.put(RequestType.AMPERE, new AmpereRequest());
@@ -280,7 +283,6 @@ public class DeviceActivity extends AppCompatActivity
         }
 
         String requestBit = hexString[5];
-        //Log.d(TAG, "requestBit: "+requestBit+" " + Arrays.toString(hexString));
 
         if (bytes.length > 10) { //Super handling
             if (requestBit.equals(requestTypes.get(RequestType.SUPERMASTER).getRequestBit())) {
@@ -295,7 +297,7 @@ public class DeviceActivity extends AppCompatActivity
                 currDiff = diff;
 
                 lastTimeStamp = now;
-                Log.d(TAG, "time in ms:" + diff);
+                Log.d(TAG, "statusTextView in ms:" + diff);
                 requestTypes.get(RequestType.SUPERBATTERY).handleResponse(hexString);
             } else {
                 String[] combinedRespose = new String[lastResponse.length + hexString.length];
@@ -402,8 +404,9 @@ public class DeviceActivity extends AppCompatActivity
                     rangeMeter.setText(Statistics.getRemainingRange() + " km ");
                     spentPower.setText("spent: " + df.format(Statistics.getSpent()) + " Ah");
                     recoveredPower.setText("recovered: " + df.format(Statistics.getRecovered()) + " Ah");
-                    time.setText(Statistics.getCurrDiff() + " ms");
-                    life.setText(Statistics.getBatteryLife() + " %");
+                    statusTextView.setText("Response time: " + Statistics.getCurrDiff() + " ms");
+                    batteryLifeTextView.setText(Statistics.getBatteryLife() + " %");
+                    currentSpeedTextView.setText(Statistics.getCurrentSpeed() + " km/h");
                     ampMeter.setText(Statistics.getCurrentAmpere() + " A");
                     voltageMeter.setText(Statistics.getCurrentVoltage() + " V");
                     battTemp.setText(Statistics.getBatteryTemperature() + " °C");

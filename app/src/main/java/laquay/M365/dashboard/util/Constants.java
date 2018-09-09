@@ -8,7 +8,7 @@ public class Constants {
     public static int QUEUE_DELAY = 400;
     private static int VOLTAGE_DELAY = 400;
     private static int AMPERE_DELAY = 100;
-    private static int BATTERYLIFE_DELAY = 2000;
+    private static int BATTERYLIFE_DELAY = 5000;
     private static int SPEED_DELAY = 100;
     private static int DISTANCE_DELAY = 400;
 

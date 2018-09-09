@@ -39,12 +39,11 @@ public class DistanceRequest implements IRequest {
     @Override
     public String handleResponse(String[] request) {
         String temp = request[7] + request[6];
-        int distance = (short) Integer.parseInt(temp, 16);
 
-        double v = distance;
-        v = v / 100;
-        //Log.d("Dist","distance:"+v);
+        int distance = (short) Integer.parseInt(temp, 16);
+        double v = distance / 100.0;
         Statistics.setDistanceTravelled(v);
+
         return v + " km";
     }
 

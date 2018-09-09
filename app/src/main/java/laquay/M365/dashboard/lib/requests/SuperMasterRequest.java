@@ -5,7 +5,6 @@ import laquay.M365.dashboard.lib.NbMessage;
 import laquay.M365.dashboard.lib.Statistics;
 
 public class SuperMasterRequest implements IRequest {
-
     private final String requestBit = "B0";
     private final RequestType requestType = RequestType.SUPERMASTER;
 
@@ -31,29 +30,24 @@ public class SuperMasterRequest implements IRequest {
 
     @Override
     public String handleResponse(String[] request) {
-        String temp = request[17] + request[16];
-        int speed = (short) Integer.parseInt(temp, 16);
-        double v = speed;
-        v = v / 1000;
-        //Log.d("Speed","speed:"+v);
+        String tempSpeed = request[17] + request[16];
+        String tempDistance = request[25] + request[24];
+        String tempTemperature = request[29] + request[28];
+
+        int speed = (short) Integer.parseInt(tempSpeed, 16);
+        double v = speed / 1000.0;
         Statistics.setSpeed(v);
         v = Statistics.round(v, 1);
 
-        temp = request[25] + request[24];
-        int distance = (short) Integer.parseInt(temp, 16);
-
-        double dist = distance;
-        dist = dist / 100;
+        int distance = (short) Integer.parseInt(tempDistance, 16);
+        double dist = distance / 100.0;
         Statistics.setDistanceTravelled(dist);
 
-        temp = request[29] + request[28];
-        int temperature = (short) Integer.parseInt(temp, 16);
-        double temperature1 = temperature;
-        temperature1 = temperature1 / 10;
-        Statistics.setMotorTemperature(temperature1);
-        //Log.d("SuperDistance","Distance:"+dist);
+        int temperature = (short) Integer.parseInt(tempTemperature, 16);
+        double temp = temperature / 10.0;
+        Statistics.setMotorTemperature(temp);
 
-        return v + "";
+        return v + ""; // TODO ???
     }
 
     @Override
