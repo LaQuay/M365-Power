@@ -132,7 +132,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="Curr. Efficiency"
-        android:textSize="25sp" />
+        android:textSize="25sp"
+        android:visibility="gone" />
 
     <laquay.M365.dashboard.component.SpecialTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/AverageEfficiencyMeter"
@@ -140,7 +141,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="Avg. Efficiency"
-        android:textSize="25sp" />
+        android:textSize="25sp"
+        android:visibility="gone" />
 
     <laquay.M365.dashboard.component.SpecialTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/rangeMeter"
@@ -148,7 +150,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="Rem. Range"
-        android:textSize="25sp" />
+        android:textSize="25sp"
+        android:visibility="gone" />
 
     <laquay.M365.dashboard.component.SpecialTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/averageSpeedMeter"
@@ -156,7 +159,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="Average Speed"
-        android:textSize="25sp" />
+        android:textSize="25sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/minPowerView"
@@ -164,7 +168,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="min Power: -100W"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/maxPowerView"
@@ -172,7 +177,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="max Power: 500 W"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/recoveredPower"
@@ -180,7 +186,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="recovered: 10 ah"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/spentPower"
@@ -188,5 +195,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="spent: 10 Ah"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:visibility="gone" />
 </LinearLayout>

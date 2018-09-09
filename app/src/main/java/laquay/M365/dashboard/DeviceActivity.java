@@ -71,10 +71,10 @@ public class DeviceActivity extends AppCompatActivity
     private static long lastTimeStamp;
     private static double currDiff = 0L;
     private SpecialTextView voltageMeter;
-    private SpecialTextView ampMeter;
+    private SpecialTextView currentAmpereTextView;
     private SpecialTextView batteryLifeTextView;
     private SpecialTextView currentSpeedTextView;
-    private TextView powerMeter;
+    private TextView currentPowerTextView;
     private TextView minPowerView;
     private TextView maxPowerView;
     private TextView efficiencyMeter;
@@ -84,7 +84,7 @@ public class DeviceActivity extends AppCompatActivity
     private TextView statusTextView;
     private TextView battTemp;
     private TextView distance;
-    private TextView capacity;
+    private TextView currentBatteryCapTextView;
     private TextView averageSpeed;
     private TextView averageEfficiency;
     private TextView motorTemp;
@@ -199,15 +199,15 @@ public class DeviceActivity extends AppCompatActivity
         voltageMeter.setType(RequestType.VOLTAGE);
         textViews.add(voltageMeter);
 
-        ampMeter = findViewById(R.id.tv_motor_amp);
-        ampMeter.setType(RequestType.AMPERE);
-        textViews.add(ampMeter);
+        currentAmpereTextView = findViewById(R.id.tv_motor_amp);
+        currentAmpereTextView.setType(RequestType.AMPERE);
+        textViews.add(currentAmpereTextView);
 
         currentSpeedTextView = findViewById(R.id.tv_current_speed);
         currentSpeedTextView.setType(RequestType.SPEED);
         textViews.add(currentSpeedTextView);
 
-        powerMeter = findViewById(R.id.tv_current_power);
+        currentPowerTextView = findViewById(R.id.tv_current_power);
         minPowerView = findViewById(R.id.minPowerView);
         maxPowerView = findViewById(R.id.maxPowerView);
         efficiencyMeter = findViewById(R.id.efficiencyMeter);
@@ -216,7 +216,7 @@ public class DeviceActivity extends AppCompatActivity
         spentPower = findViewById(R.id.spentPower);
         battTemp = findViewById(R.id.tv_battery_temp);
         distance = findViewById(R.id.tv_distance_meter);
-        capacity = findViewById(R.id.tv_remaining_amps);
+        currentBatteryCapTextView = findViewById(R.id.tv_remaining_amps);
         averageEfficiency = findViewById(R.id.AverageEfficiencyMeter);
         averageSpeed = findViewById(R.id.averageSpeedMeter);
         motorTemp = findViewById(R.id.tv_motor_temperature);
@@ -387,38 +387,33 @@ public class DeviceActivity extends AppCompatActivity
             }
         }
 
+        DecimalFormat df = new DecimalFormat("#.####");
+        df.setRoundingMode(RoundingMode.CEILING);
+        DecimalFormat df1 = new DecimalFormat("##.#");
+        df.setRoundingMode(RoundingMode.CEILING);
         //update on each response
-        Thread t = new Thread() {
-            public void run() {
-                runOnUiThread(() -> {
-                    powerMeter.setText((int) Statistics.getPower() + "W");
-                    DecimalFormat df = new DecimalFormat("#.####");
-                    df.setRoundingMode(RoundingMode.CEILING);
-                    DecimalFormat df1 = new DecimalFormat("##.#");
-                    df.setRoundingMode(RoundingMode.CEILING);
-                    minPowerView.setText("min Power: " + (int) Statistics.getMinPower() + "W");
-                    maxPowerView.setText("max Power: " + (int) Statistics.getMaxPower() + "W");
-                    //minPowerView.setText("QueueD: " + Constants.QUEUE_DELAY + "ms");
-                    //maxPowerView.setText("Req/Res: " + Statistics.getRequestsSent() + " " + Statistics.getResponseReceived());
-                    efficiencyMeter.setText(Statistics.getMampHoursPerKilometer() + " mAh/Km");
-                    rangeMeter.setText(Statistics.getRemainingRange() + " km ");
-                    spentPower.setText("spent: " + df.format(Statistics.getSpent()) + " Ah");
-                    recoveredPower.setText("recovered: " + df.format(Statistics.getRecovered()) + " Ah");
-                    statusTextView.setText("Response time: " + Statistics.getCurrDiff() + " ms");
-                    batteryLifeTextView.setText(Statistics.getBatteryLife() + " %");
-                    currentSpeedTextView.setText(Statistics.getCurrentSpeed() + " km/h");
-                    ampMeter.setText(Statistics.getCurrentAmpere() + " A");
-                    voltageMeter.setText(Statistics.getCurrentVoltage() + " V");
-                    battTemp.setText(Statistics.getBatteryTemperature() + " °C");
-                    motorTemp.setText(Statistics.getMotorTemperature() + " °C");
-                    capacity.setText(Statistics.getRemainingCapacity() + "");
-                    distance.setText(df1.format(Statistics.getDistanceTravelled()) + " km");
-                    averageEfficiency.setText(df1.format(Statistics.getAverageEfficiency()) + " mAh/km");
-                    averageSpeed.setText(df1.format(Statistics.getAverageSpeed()) + " km/h");
-                });
-            }
-        };
-        t.start();
+        runOnUiThread(() -> {
+            currentSpeedTextView.setText(Statistics.getCurrentSpeed() + " km/h");
+            currentPowerTextView.setText((int) Statistics.getPower() + " W");
+            rangeMeter.setText(Statistics.getRemainingRange() + " km ");
+            spentPower.setText("spent: " + df.format(Statistics.getSpent()) + " Ah");
+            recoveredPower.setText("recovered: " + df.format(Statistics.getRecovered()) + " Ah");
+            statusTextView.setText("Response time: " + Statistics.getCurrDiff() + " ms");
+            batteryLifeTextView.setText(Statistics.getBatteryLife() + " %");
+            currentAmpereTextView.setText(Statistics.getCurrentAmpere() + " A");
+            voltageMeter.setText(Statistics.getCurrentVoltage() + " V");
+            battTemp.setText(Statistics.getBatteryTemperature() + " °C");
+            motorTemp.setText(Statistics.getMotorTemperature() + " °C");
+            currentBatteryCapTextView.setText(Statistics.getRemainingCapacity() + " mAh");
+            distance.setText(df1.format(Statistics.getDistanceTravelled()) + " km");
+            averageEfficiency.setText(df1.format(Statistics.getAverageEfficiency()) + " mAh/km");
+            averageSpeed.setText(df1.format(Statistics.getAverageSpeed()) + " km/h");
+            minPowerView.setText("min Power: " + (int) Statistics.getMinPower() + "W");
+            maxPowerView.setText("max Power: " + (int) Statistics.getMaxPower() + "W");
+            //minPowerView.setText("QueueD: " + Constants.QUEUE_DELAY + "ms");
+            //maxPowerView.setText("Req/Res: " + Statistics.getRequestsSent() + " " + Statistics.getResponseReceived());
+            efficiencyMeter.setText(Statistics.getMampHoursPerKilometer() + " mAh/Km");
+        });
     }
 
     private void checkFirst() {
