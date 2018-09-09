@@ -7,10 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -18,13 +15,15 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import laquay.M365.dashboard.manager.DeviceAdapter;
-import laquay.M365.dashboard.manager.DeviceManager;
+import laquay.M365.dashboard.device.ConnectionCallback;
+import laquay.M365.dashboard.device.Device;
+import laquay.M365.dashboard.device.DeviceAdapter;
+import laquay.M365.dashboard.device.DeviceManager;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 @RuntimePermissions
-public class ScanActivity extends Activity implements BluetoothAdapter.LeScanCallback {
+public class ScanActivity extends Activity implements BluetoothAdapter.LeScanCallback, ConnectionCallback {
     private BluetoothAdapter mBTAdapter;
     private DeviceAdapter mDeviceAdapter;
     private boolean mIsScanning;
@@ -32,10 +31,13 @@ public class ScanActivity extends Activity implements BluetoothAdapter.LeScanCal
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_scan);
 
-        init();
+        initBT();
+
+        initVisualElements();
+
+        ScanActivityPermissionsDispatcher.startScanWithPermissionCheck(this);
     }
 
     @Override
@@ -46,51 +48,17 @@ public class ScanActivity extends Activity implements BluetoothAdapter.LeScanCal
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (mIsScanning) {
-            menu.findItem(R.id.action_scan).setVisible(false);
-            menu.findItem(R.id.action_stop).setVisible(true);
-        } else {
-            menu.findItem(R.id.action_scan).setVisible(true);
-            menu.findItem(R.id.action_stop).setVisible(false);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == android.R.id.home) {
-            // ignore
-            return true;
-        } else if (itemId == R.id.action_scan) {
-            ScanActivityPermissionsDispatcher.startScanWithPermissionCheck(this);
-            return true;
-        } else if (itemId == R.id.action_stop) {
-            stopScan();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onLeScan(final BluetoothDevice newDeivce, final int newRssi,
+    public void onLeScan(final BluetoothDevice newDevice, final int newRssi,
                          final byte[] newScanRecord) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mDeviceAdapter.update(newDeivce, newRssi, newScanRecord);
+                mDeviceAdapter.update(newDevice, newRssi, newScanRecord);
             }
         });
     }
 
-    private void init() {
+    private void initBT() {
         // BLE check
         if (!DeviceManager.isBLESupported(this)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
@@ -99,7 +67,7 @@ public class ScanActivity extends Activity implements BluetoothAdapter.LeScanCal
         }
 
         // BT check
-        BluetoothManager manager = DeviceManager.getManager(this);
+        BluetoothManager manager = DeviceManager.getInstance(this).getBluetoothManager();
         if (manager != null) {
             mBTAdapter = manager.getAdapter();
         }
@@ -111,33 +79,35 @@ public class ScanActivity extends Activity implements BluetoothAdapter.LeScanCal
         if (!mBTAdapter.isEnabled()) {
             Toast.makeText(this, R.string.bt_disabled, Toast.LENGTH_SHORT).show();
             finish();
-            return;
         }
+    }
 
-        // init listview
-        ListView deviceListView = findViewById(R.id.list);
-        mDeviceAdapter = new DeviceAdapter(this, R.layout.listitem_device,
-                new ArrayList<DeviceManager>());
+    private void initVisualElements() {
+        // initBT listview
+        ListView deviceListView = findViewById(R.id.lv_device);
+        mDeviceAdapter = new DeviceAdapter(this, R.layout.listitem_device, new ArrayList<>());
         deviceListView.setAdapter(mDeviceAdapter);
         deviceListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterview, View view, int position, long id) {
-                DeviceManager item = mDeviceAdapter.getItem(position);
-                if (item != null) {
-                    Intent intent = new Intent(view.getContext(), DeviceActivity.class);
-                    BluetoothDevice selectedDevice = item.getDevice();
-                    //intent.putExtra(DeviceActivity.EXTRA_BLUETOOTH_DEVICE, selectedDevice);
-                    intent.putExtra(DeviceActivity.EXTRAS_DEVICE_NAME, selectedDevice.getName());
-                    intent.putExtra(DeviceActivity.EXTRAS_DEVICE_ADDRESS, selectedDevice.getAddress());
-                    startActivity(intent);
-
+                Device device = mDeviceAdapter.getItem(position);
+                if (device != null) {
                     // stop before change Activity
                     stopScan();
+
+                    Toast.makeText(getApplicationContext(), "Connecting to " + device.getBtDevice().getName(), Toast.LENGTH_SHORT).show();
+                    setUpDevice(device);
+                    connectToDevice();
+
+                    BluetoothDevice btDevice = device.getBtDevice();
+                    Intent intent = new Intent(view.getContext(), DeviceActivity.class);
+                    //intent.putExtra(DeviceActivity.EXTRA_BLUETOOTH_DEVICE, selectedDevice);
+                    intent.putExtra(DeviceActivity.EXTRAS_DEVICE_NAME, btDevice.getName());
+                    intent.putExtra(DeviceActivity.EXTRAS_DEVICE_ADDRESS, btDevice.getAddress());
+                    startActivity(intent);
                 }
             }
         });
-
-        stopScan();
     }
 
     @NeedsPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -145,8 +115,6 @@ public class ScanActivity extends Activity implements BluetoothAdapter.LeScanCal
         if ((mBTAdapter != null) && (!mIsScanning)) {
             mBTAdapter.startLeScan(this);
             mIsScanning = true;
-            setProgressBarIndeterminateVisibility(true);
-            invalidateOptionsMenu();
         }
     }
 
@@ -155,7 +123,27 @@ public class ScanActivity extends Activity implements BluetoothAdapter.LeScanCal
             mBTAdapter.stopLeScan(this);
         }
         mIsScanning = false;
-        setProgressBarIndeterminateVisibility(false);
-        invalidateOptionsMenu();
+    }
+
+    private void setUpDevice(Device selectedDevice) {
+        DeviceManager.getInstance(this).setBluetoothDevice(selectedDevice.getBtDevice(), selectedDevice.getRssi());
+    }
+
+    private void connectToDevice() {
+        if (DeviceManager.getInstance(this).isConnected()) {
+            DeviceManager.getInstance(this).triggerDisconnect();
+        } else {
+            DeviceManager.getInstance(this).triggerConnect(this);
+        }
+    }
+
+    @Override
+    public void onConnectionOK(String data) {
+        Toast.makeText(this, "Connection OK", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onConnectionFail(String error) {
+        Toast.makeText(this, "Connection Error", Toast.LENGTH_LONG).show();
     }
 }

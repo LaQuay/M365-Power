@@ -1,7 +1,6 @@
 package laquay.M365.dashboard;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -20,11 +19,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.polidea.rxandroidble2.RxBleClient;
-import com.polidea.rxandroidble2.RxBleConnection;
-import com.polidea.rxandroidble2.RxBleDevice;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -34,15 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import laquay.M365.dashboard.component.SpecialTextView;
+import laquay.M365.dashboard.device.DeviceManager;
+import laquay.M365.dashboard.device.ResponseCallback;
 import laquay.M365.dashboard.lib.Statistics;
 import laquay.M365.dashboard.lib.requests.AmpereRequest;
 import laquay.M365.dashboard.lib.requests.BatteryLifeRequest;
@@ -71,21 +62,14 @@ import laquay.M365.dashboard.util.HexString;
 import laquay.M365.dashboard.util.LogWriter;
 
 public class DeviceActivity extends AppCompatActivity
-        implements ActivityCompat.OnRequestPermissionsResultCallback {
+        implements ActivityCompat.OnRequestPermissionsResultCallback, ResponseCallback {
 
+    private static final String TAG = DeviceActivity.class.getSimpleName();
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
-    private final static String TAG = DeviceActivity.class.getSimpleName();
     private static long lastTimeStamp;
     private static double currDiff = 0L;
-    private RxBleClient rxBleClient;
-    private Observable<RxBleConnection> connectionObservable;
-    private Disposable connectionDisposable;
-    private RxBleConnection connection;
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private RxBleDevice bleDevice;
     private SpecialTextView voltageMeter;
     private SpecialTextView ampMeter;
     private SpecialTextView life;
@@ -122,6 +106,38 @@ public class DeviceActivity extends AppCompatActivity
     private static final int PERMISSION_EXTERNAL_STORAGE = 0;
     private ConstraintLayout mRootView;
 
+    private ResponseCallback responseCallback;
+    private Menu menu;
+    private String mDeviceName;
+    private String mDeviceAddress;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    private Runnable process = new Runnable() {
+        @Override
+        public void run() {
+            DeviceManager.getInstance(getBaseContext()).setupNotificationAndSend(responseCallback);
+            try {
+                Log.e(TAG, "Queue size: " + requestQueue.size());
+                IRequest toSend = requestQueue.remove();
+                String command = toSend.getRequestString();
+                Log.d(TAG, "command:" + command);
+                if (DeviceManager.getInstance(getBaseContext()).isConnected()) {
+                    DeviceManager.getInstance(getBaseContext()).writeCharacteristic(command);
+                    //Log.d(TAG, "Req sent: " + command);
+                    if (toSend.getRequestType() != RequestType.NOCOUNT) {
+                        Statistics.countRequest();
+                    }
+                }
+            } catch (NoSuchElementException ignored) {
+            } finally {
+                handler1.postDelayed(this, Constants.QUEUE_DELAY);
+            }
+        }
+    };
     private Runnable updateSuperRunnable = new Runnable() {
         @Override
         public void run() {
@@ -136,7 +152,6 @@ public class DeviceActivity extends AppCompatActivity
             handler.postDelayed(this, Constants.getAmpereDelay());
         }
     };
-
     private Runnable getLogsRunnable = new Runnable() {
         @Override
         public void run() {
@@ -150,8 +165,8 @@ public class DeviceActivity extends AppCompatActivity
             Log.d(TAG, "Queue Size:" + requestQueue.size() + " QueueDelay:" + Constants.QUEUE_DELAY + " BaseDelay:" + Constants.BASE_DELAY);
             Log.d(TAG, "Sent:" + Statistics.getRequestsSent() + " Received:" + Statistics.getResponseReceived() + " Ratio:" + (double) Statistics.getRequestsSent() / Statistics.getResponseReceived());
             adjustTiming();
-            fillCheckFirstList();
-            if (isConnected()) {
+
+            if (DeviceManager.getInstance(getBaseContext()).isConnected()) {
                 handler.removeCallbacksAndMessages(null);
                 handler.postDelayed(updateSuperRunnable, Constants.getSpeedDelay());
                 handler.postDelayed(updateSuperBatteryRunnable, Constants.getAmpereDelay());
@@ -162,38 +177,6 @@ public class DeviceActivity extends AppCompatActivity
             }
         }
     };
-    private Runnable process = new Runnable() {
-        @Override
-        public void run() {
-            if (!checkFirst.isEmpty()) {
-                checkFirst();
-            }
-            setupNotificationAndSend();
-            try {
-                IRequest toSend = requestQueue.remove();
-                String command = toSend.getRequestString();
-                Log.d(TAG, "command:" + command);
-                if (isConnected()) {
-                    connection.writeCharacteristic(UUID.fromString(Constants.CHAR_WRITE), HexString.hexToBytes(command)).subscribe();
-                    //Log.d(TAG, "Req sent: " + command);
-                    if (toSend.getRequestType() != RequestType.NOCOUNT) {
-                        Statistics.countRequest();
-                    }
-                }
-            } catch (NoSuchElementException e) {
-            } finally {
-                handler1.postDelayed(this, Constants.QUEUE_DELAY);
-            }
-        }
-    };
-    private Menu menu;
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        handlerThread.quit();
-        handlerThread1.quit();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,6 +184,12 @@ public class DeviceActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_device);
+
+        Intent intent = getIntent();
+        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
+        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+
+        mRootView = findViewById(R.id.root);
 
         voltageMeter = findViewById(R.id.voltageMeter);
         voltageMeter.setType(RequestType.VOLTAGE);
@@ -233,14 +222,6 @@ public class DeviceActivity extends AppCompatActivity
         life.setType(RequestType.BATTERYLIFE);
         textViews.add(life);
 
-        final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-
-        rxBleClient = RxBleClient.create(this);
-        bleDevice = rxBleClient.getBleDevice(mDeviceAddress);
-        connectionObservable = prepareConnectionObservable();
-
         requestTypes.put(RequestType.VOLTAGE, new VoltageRequest());
         requestTypes.put(RequestType.AMPERE, new AmpereRequest());
         requestTypes.put(RequestType.BATTERYLIFE, new BatteryLifeRequest());
@@ -254,10 +235,8 @@ public class DeviceActivity extends AppCompatActivity
         requestTypes.put(RequestType.LIGHT, new CheckLight());
         requestTypes.put(RequestType.RECOVERY, new CheckRecovery());
 
-        fillCheckFirstList();
-
         lastTimeStamp = System.nanoTime();
-        mRootView = findViewById(R.id.root);
+        responseCallback = this;
 
         handlerThread = new HandlerThread("RequestThread");
         handlerThread.start();
@@ -272,36 +251,26 @@ public class DeviceActivity extends AppCompatActivity
         } else {
             storagePermission = true;
         }
-    }
 
-    private void fillCheckFirstList() {
-        checkFirst.clear();
-        checkFirst.add(RequestType.CRUISE);
-        checkFirst.add(RequestType.LOCK);
-        checkFirst.add(RequestType.LIGHT);
-        checkFirst.add(RequestType.RECOVERY);
-    }
-
-    @SuppressLint("CheckResult")
-    private void setupNotificationAndSend() {
-        connection.setupNotification(UUID.fromString(Constants.CHAR_READ))
-                .doOnNext(notificationObservable -> {
-                })
-                .flatMap(notificationObservable -> notificationObservable) // <-- Notification has been set up, now observe value changes.
-                .timeout(200, TimeUnit.MILLISECONDS)
-                .onErrorResumeNext(Observable.empty())
-                .subscribe(
-                        bytes -> updateUI(bytes)
-
-                );
+        Runnable connectRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (DeviceManager.getInstance(getBaseContext()).isConnected()) {
+                    handler1.post(process);
+                    handler.post(runnableMeta);
+                    checkFirst();
+                } else {
+                    handler1.postDelayed(this, Constants.BASE_DELAY);
+                }
+            }
+        };
+        connectRunnable.run();
     }
 
     private void updateUI(byte[] bytes) {
         if (bytes.length == 0) { //super request returns a third empty message
             return;
         }
-        //Log.d(TAG, "Resp rec. length:" + bytes.length);
-        //handler1.post(process);
 
         String[] hexString = new String[bytes.length];
         for (int i = 0; i < bytes.length; i++) {
@@ -449,101 +418,13 @@ public class DeviceActivity extends AppCompatActivity
         t.start();
     }
 
-    private Observable<RxBleConnection> prepareConnectionObservable() {
-        return bleDevice
-                .establishConnection(false);
-    }
-
-    private boolean isConnected() {
-        return bleDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
-    }
-
-    public void connect(View view) {
-        doConnect();
-    }
-
-    public void startHandler(View view) {
-        if (!handlerStarted) {
-            if (!isConnected()) {
-                doConnect();
-                Handler handler = new Handler();
-                handler.postDelayed(() -> {
-                    handler1.post(process);
-                    handler.post(runnableMeta);
-                }, 5000);
-            } else {
-                handler1.post(process);
-                handler.post(runnableMeta);
-            }
-            startHandlerButton.setText("Stop Handler");
-            handlerStarted = true;
-        } else {
-            stopHandler();
-            handlerStarted = false;
-        }
-    }
-
-    public void reset(View view) {
-        Statistics.resetPowerStats();
-    }
-
-    public void stopHandler() {
-        Log.d(TAG, "Stop Handler called");
-        handler.removeCallbacksAndMessages(null);
-        handler1.removeCallbacksAndMessages(null);
-        requestQueue.clear();
-        logWriter.writeLog(true);
-        Toast.makeText(this, "Logs in:" + logWriter.getPath(), Toast.LENGTH_LONG).show();
-        startHandlerButton.setText("Start Handler");
-    }
-
-    private void doConnect() {
-        if (isConnected()) {
-            triggerDisconnect();
-        } else {
-            connectionDisposable = bleDevice.establishConnection(false)
-                    //.compose(bindUntilEvent(PAUSE))
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doFinally(this::dispose)
-                    .doOnError(throwable -> {
-                        System.out.println("ERROR,disconnect");
-                        Toast.makeText(DeviceActivity.this, "Could not connect to scooter,please retry", Toast.LENGTH_LONG).show();
-                        //handler.removeCallbacksAndMessages(null);
-                        //handler1.removeCallbacksAndMessages(null);
-                        dispose();
-                        time.setText("disconnected");
-                    })
-                    .subscribe(this::onConnectionReceived, this::onConnectionFailure);
-        }
-    }
-
-    private void triggerDisconnect() {
-        if (connectionDisposable != null) {
-            connectionDisposable.dispose();
-        }
-        time.setText("disconnected");
-        stopHandler();
-    }
-
-    private void dispose() {
-        connectionDisposable = null;
-    }
-
-    private void onConnectionFailure(Throwable throwable) {
-        Log.d(TAG, "connection fail: " + throwable.getMessage());
-        Toast.makeText(DeviceActivity.this, "Could not connect to scooter,please retry", Toast.LENGTH_LONG).show();
-    }
-
-    private void onConnectionReceived(RxBleConnection connection) {
-        fillCheckFirstList();
-        Toast.makeText(DeviceActivity.this, "Starting preliminary activities", Toast.LENGTH_LONG).show();
-        this.connection = connection;
-        this.time.setText("connected");
-        handler1.post(process);
-        checkFirst();
-    }
-
     private void checkFirst() {
+        checkFirst.clear();
+        checkFirst.add(RequestType.CRUISE);
+        checkFirst.add(RequestType.LOCK);
+        checkFirst.add(RequestType.LIGHT);
+        checkFirst.add(RequestType.RECOVERY);
+
         for (RequestType e : checkFirst) {
             requestQueue.addFirst(requestTypes.get(e));
         }
@@ -636,7 +517,7 @@ public class DeviceActivity extends AppCompatActivity
             Statistics.resetPowerStats();
             return true;
         } else if (id == R.id.connect) {
-            doConnect();
+            //doConnect();
             return true;
         } else if (id == R.id.lock) {
             if (Statistics.isScooterLocked()) {
@@ -681,7 +562,7 @@ public class DeviceActivity extends AppCompatActivity
             }
             return true;
         }
-        fillCheckFirstList();
+        //fillCheckFirstList();
         return super.onOptionsItemSelected(item);
     }
 
@@ -723,5 +604,10 @@ public class DeviceActivity extends AppCompatActivity
 
     private void lockOff() {
         requestQueue.addFirst(new LockOff());
+    }
+
+    @Override
+    public void onResponse(byte[] bytes) {
+        updateUI(bytes);
     }
 }

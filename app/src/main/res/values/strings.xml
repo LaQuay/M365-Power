@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">M365 Power</string>
+    <string name="app_name">M365 Panel</string>
     <string name="ble_not_supported">BLE not supported on this device</string>
     <string name="bt_unavailable">Bluetooth unavailable</string>
     <string name="bt_disabled">Bluetooth disabled, turn on and restart</string>
@@ -132,4 +132,5 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="scanning_automatically">Scanning BT Devices automatically…</string>
 </resources>

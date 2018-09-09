@@ -16,12 +16,10 @@ public class SpecialTextView extends android.support.v7.widget.AppCompatTextView
 
     public SpecialTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
     }
 
     public SpecialTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
     }
 
     public SpecialTextView(Context context, @Nullable AttributeSet attrs, RequestType type) {

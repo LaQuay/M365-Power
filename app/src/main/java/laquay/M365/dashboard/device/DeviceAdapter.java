@@ -1,4 +1,4 @@
-package laquay.M365.dashboard.manager;
+package laquay.M365.dashboard.device;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -12,13 +12,13 @@ import java.util.List;
 
 import laquay.M365.dashboard.R;
 
-public class DeviceAdapter extends ArrayAdapter<DeviceManager> {
-    private static final String PREFIX_RSSI = "RSSI:";
-    private List<DeviceManager> mList;
+public class DeviceAdapter extends ArrayAdapter<Device> {
+    private static final String PREFIX_RSSI = "RSSI: ";
+    private List<Device> mList;
     private LayoutInflater mInflater;
     private int mResId;
 
-    public DeviceAdapter(Context context, int resId, List<DeviceManager> objects) {
+    public DeviceAdapter(Context context, int resId, List<Device> objects) {
         super(context, resId, objects);
         mResId = resId;
         mList = objects;
@@ -27,15 +27,15 @@ public class DeviceAdapter extends ArrayAdapter<DeviceManager> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        DeviceManager item = getItem(position);
+        Device item = getItem(position);
 
         if (convertView == null) {
             convertView = mInflater.inflate(mResId, null);
         }
         TextView name = convertView.findViewById(R.id.device_name);
-        name.setText(item.getDisplayName());
+        name.setText(item.getBtDevice().getName());
         TextView address = convertView.findViewById(R.id.device_address);
-        address.setText(item.getDevice().getAddress());
+        address.setText(item.getBtDevice().getAddress());
         TextView rssi = convertView.findViewById(R.id.device_rssi);
         rssi.setText(PREFIX_RSSI + Integer.toString(item.getRssi()));
 
@@ -51,8 +51,8 @@ public class DeviceAdapter extends ArrayAdapter<DeviceManager> {
         }
 
         boolean contains = false;
-        for (DeviceManager device : mList) {
-            if (newDevice.getAddress().equals(device.getDevice().getAddress())) {
+        for (Device device : mList) {
+            if (newDevice.getAddress().equals(device.getBtDevice().getAddress())) {
                 contains = true;
                 device.setRssi(rssi); // update
                 break;
@@ -60,7 +60,7 @@ public class DeviceAdapter extends ArrayAdapter<DeviceManager> {
         }
         if (!contains) {
             // add new BluetoothDevice
-            mList.add(new DeviceManager(newDevice, rssi));
+            mList.add(new Device(newDevice, rssi));
         }
         notifyDataSetChanged();
     }
