@@ -297,48 +297,6 @@ public class Statistics {
         return recovered;
     }
 
-    public static LogDTO getLogStats() {
-        calculateEnergy();
-        LogDTO logDTO = new LogDTO();
-        double currentSum = 0.0;
-        for (double d : currentList) {
-            currentSum += d;
-        }
-        double speedSum = speedList.stream().mapToDouble(Double::doubleValue).sum();
-        double averageCurrent = (currentSum / currentList.size());
-        double averageSpeed = speedSum / speedList.size();
-        if (Double.isNaN(averageCurrent)) {
-            averageCurrent = getCurrentAmpere();
-        }
-        if (Double.isNaN(averageSpeed)) {
-            averageSpeed = getCurrentSpeed();
-        }
-        averageSpeedList.add(averageSpeed);
-        logDTO.setAverageCurrent(round(averageCurrent, 2));
-        logDTO.setAveragePower(round(averageCurrent * currentVoltage, 2));
-        logDTO.setAverageSpeed(averageSpeed);
-        logDTO.setBatteryLife(getBatteryLife());
-        logDTO.setRecoveredPower(round(getRecovered(), 4));
-        logDTO.setSpentPower(round(getSpent(), 4));
-        logDTO.setVoltage(getCurrentVoltage());
-        logDTO.setRemainingCapacity(getRemainingCapacity());
-        logDTO.setDistanceTravelled(getDistanceTravelled());
-        logDTO.setBattTemp(getBatteryTemperature());
-        logDTO.setMampHoursPerKilometer(getMampHoursPerKilometer());
-        logDTO.setRemainingRange(getRemainingRange());
-        logDTO.setTimestamp(lastTimeStamp);
-
-        currentList.clear();
-        speedList.clear();
-        return logDTO;
-    }
-
-    public static double round(double toRound, int decimals) {
-        int temp = (int) (toRound * Math.pow(10, decimals));
-        double temp2 = (double) temp;
-        return temp2 / Math.pow(10, decimals);
-    }
-
     public static int getBatteryLife() {
         return batteryLife;
     }
@@ -383,6 +341,47 @@ public class Statistics {
 
     public static double getRemainingRange() {
         return round(remainingRange, 1);
+    }
+
+    public static LogDTO getLogStats() {
+        calculateEnergy();
+        LogDTO logDTO = new LogDTO();
+        double currentSum = 0.0;
+        for (double d : currentList) {
+            currentSum += d;
+        }
+        double speedSum = speedList.stream().mapToDouble(Double::doubleValue).sum();
+        double averageCurrent = (currentSum / currentList.size());
+        double averageSpeed = speedSum / speedList.size();
+        if (Double.isNaN(averageCurrent)) {
+            averageCurrent = getCurrentAmpere();
+        }
+        if (Double.isNaN(averageSpeed)) {
+            averageSpeed = getCurrentSpeed();
+        }
+        averageSpeedList.add(averageSpeed);
+        logDTO.setAverageCurrent(round(averageCurrent, 2));
+        logDTO.setAveragePower(round(averageCurrent * currentVoltage, 2));
+        logDTO.setAverageSpeed(averageSpeed);
+        logDTO.setBatteryLife(getBatteryLife());
+        logDTO.setRecoveredPower(round(getRecovered(), 4));
+        logDTO.setSpentPower(round(getSpent(), 4));
+        logDTO.setVoltage(getCurrentVoltage());
+        logDTO.setRemainingCapacity(getRemainingCapacity());
+        logDTO.setDistanceTravelled(getDistanceTravelled());
+        logDTO.setBattTemp(getBatteryTemperature());
+        logDTO.setMampHoursPerKilometer(getMampHoursPerKilometer());
+        logDTO.setRemainingRange(getRemainingRange());
+        logDTO.setTimestamp(lastTimeStamp);
+
+        currentList.clear();
+        speedList.clear();
+        return logDTO;
+    }
+
+    public static double round(double toRound, int decimals) {
+        int temp = (int) (toRound * Math.pow(10, decimals));
+        return (double) temp / Math.pow(10, decimals);
     }
 
     public static void activateLogging(boolean enable) {

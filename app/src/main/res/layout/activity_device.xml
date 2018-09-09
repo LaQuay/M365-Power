@@ -7,122 +7,216 @@
     android:orientation="vertical"
     tools:context="laquay.M365.dashboard.DeviceActivity">
 
-    <TextView
-        android:id="@+id/tv_status"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Response T.: 500ms"
-        android:textSize="16sp" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Response T.: --- ms"
+            android:textSize="18sp" />
+
+        <DigitalClock
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="end"
+            android:textSize="28sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <laquay.M365.dashboard.component.SpecialTextView
+                android:id="@+id/tv_current_speed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="end"
+                android:text="0"
+                android:textSize="56sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:text="@string/unit_km_h"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tv_current_power"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="end"
+                android:text="0"
+                android:textSize="48sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="7dp"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:text="@string/unit_watts"
+                android:textSize="24sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <laquay.M365.dashboard.component.SpecialTextView
+            android:id="@+id/tv_battery_temp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="0"
+            android:textSize="32sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/unit_celsius"
+            android:textSize="18sp" />
+
+        <laquay.M365.dashboard.component.SpecialTextView
+            android:id="@+id/tv_motor_temperature"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="0"
+            android:textSize="32sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/unit_celsius"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <laquay.M365.dashboard.component.SpecialTextView
+            android:id="@+id/tv_battery_amp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="0"
+            android:textSize="32sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/unit_ampere"
+            android:textSize="18sp" />
+
+        <laquay.M365.dashboard.component.SpecialTextView
+            android:id="@+id/tv_voltage_meter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="0"
+            android:textSize="32sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/unit_voltage"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <laquay.M365.dashboard.component.SpecialTextView
+            android:id="@+id/tv_battery_life"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="0"
+            android:textSize="26sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/unit_percent"
+            android:textSize="18sp" />
+
+        <laquay.M365.dashboard.component.SpecialTextView
+            android:id="@+id/tv_remaining_amps"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="0"
+            android:textSize="26sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/unit_m_ampere_h"
+            android:textSize="18sp" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="Current"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/tv_current_power"
-            android:layout_width="400dp"
-            android:layout_height="wrap_content"
-            android:text="415 W"
-            android:textSize="20sp" />
-
-        <laquay.M365.dashboard.component.SpecialTextView
-            android:id="@+id/tv_current_speed"
-            android:layout_width="400dp"
-            android:layout_height="wrap_content"
-            android:text="25.0 km/h"
+            android:text="Total distance"
             android:textSize="20sp" />
 
         <laquay.M365.dashboard.component.SpecialTextView
             android:id="@+id/tv_distance_meter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="50.11 km"
-            android:textSize="20sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="Battery"
-            android:textSize="20sp" />
-
-        <laquay.M365.dashboard.component.SpecialTextView
-            android:id="@+id/tv_battery_life"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="100%"
-            android:textSize="20sp" />
-
-        <laquay.M365.dashboard.component.SpecialTextView
-            android:id="@+id/tv_voltage_meter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="40.00 V"
-            android:textSize="20sp" />
-
-        <laquay.M365.dashboard.component.SpecialTextView
-            android:id="@+id/tv_battery_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="30°C"
-            android:textSize="20sp" />
-
-        <laquay.M365.dashboard.component.SpecialTextView
-            android:id="@+id/tv_remaining_amps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="7800 mAh"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="Motor"
-            android:textSize="20sp" />
-
-        <laquay.M365.dashboard.component.SpecialTextView
-            android:id="@+id/tv_motor_temperature"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="30°C"
-            android:textSize="20sp" />
-
-        <laquay.M365.dashboard.component.SpecialTextView
-            android:id="@+id/tv_motor_amp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="10.00 A"
+            android:text="0.00 km"
             android:textSize="20sp" />
     </LinearLayout>
 

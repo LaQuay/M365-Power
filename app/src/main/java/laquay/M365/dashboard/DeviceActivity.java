@@ -20,7 +20,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -70,7 +69,7 @@ public class DeviceActivity extends AppCompatActivity
 
     private static long lastTimeStamp;
     private static double currDiff = 0L;
-    private SpecialTextView voltageMeter;
+    private SpecialTextView currentVoltageTextView;
     private SpecialTextView currentAmpereTextView;
     private SpecialTextView batteryLifeTextView;
     private SpecialTextView currentSpeedTextView;
@@ -82,12 +81,12 @@ public class DeviceActivity extends AppCompatActivity
     private TextView recoveredPower;
     private TextView spentPower;
     private TextView statusTextView;
-    private TextView battTemp;
+    private TextView currentBatteryTemperatureTextView;
     private TextView distance;
     private TextView currentBatteryCapTextView;
     private TextView averageSpeed;
     private TextView averageEfficiency;
-    private TextView motorTemp;
+    private TextView currentMotorTemperatureTextView;
 
     private Button startHandlerButton;
     private Deque<IRequest> requestQueue = new LinkedBlockingDeque<>();
@@ -195,11 +194,11 @@ public class DeviceActivity extends AppCompatActivity
 
         mRootView = findViewById(R.id.root);
 
-        voltageMeter = findViewById(R.id.tv_voltage_meter);
-        voltageMeter.setType(RequestType.VOLTAGE);
-        textViews.add(voltageMeter);
+        currentVoltageTextView = findViewById(R.id.tv_voltage_meter);
+        currentVoltageTextView.setType(RequestType.VOLTAGE);
+        textViews.add(currentVoltageTextView);
 
-        currentAmpereTextView = findViewById(R.id.tv_motor_amp);
+        currentAmpereTextView = findViewById(R.id.tv_battery_amp);
         currentAmpereTextView.setType(RequestType.AMPERE);
         textViews.add(currentAmpereTextView);
 
@@ -214,12 +213,12 @@ public class DeviceActivity extends AppCompatActivity
         rangeMeter = findViewById(R.id.rangeMeter);
         recoveredPower = findViewById(R.id.recoveredPower);
         spentPower = findViewById(R.id.spentPower);
-        battTemp = findViewById(R.id.tv_battery_temp);
+        currentBatteryTemperatureTextView = findViewById(R.id.tv_battery_temp);
         distance = findViewById(R.id.tv_distance_meter);
         currentBatteryCapTextView = findViewById(R.id.tv_remaining_amps);
         averageEfficiency = findViewById(R.id.AverageEfficiencyMeter);
         averageSpeed = findViewById(R.id.averageSpeedMeter);
-        motorTemp = findViewById(R.id.tv_motor_temperature);
+        currentMotorTemperatureTextView = findViewById(R.id.tv_motor_temperature);
         statusTextView = findViewById(R.id.tv_status);
         batteryLifeTextView = findViewById(R.id.tv_battery_life);
         batteryLifeTextView.setType(RequestType.BATTERYLIFE);
@@ -387,27 +386,27 @@ public class DeviceActivity extends AppCompatActivity
             }
         }
 
-        DecimalFormat df = new DecimalFormat("#.####");
-        df.setRoundingMode(RoundingMode.CEILING);
-        DecimalFormat df1 = new DecimalFormat("##.#");
-        df.setRoundingMode(RoundingMode.CEILING);
+        DecimalFormat df = new DecimalFormat("#.##");
         //update on each response
         runOnUiThread(() -> {
-            currentSpeedTextView.setText(Statistics.getCurrentSpeed() + " km/h");
-            currentPowerTextView.setText((int) Statistics.getPower() + " W");
-            rangeMeter.setText(Statistics.getRemainingRange() + " km ");
+            Log.e("SPEEDA", String.valueOf(Statistics.getCurrentSpeed()));
+            Log.e("SPEEDB", df.format(Statistics.getCurrentSpeed()));
+            currentSpeedTextView.setText("" + df.format(Statistics.getCurrentSpeed()));
+            currentPowerTextView.setText("" + df.format(Statistics.getPower()));
+            currentBatteryTemperatureTextView.setText("" + df.format(Statistics.getBatteryTemperature()));
+            currentMotorTemperatureTextView.setText("" + df.format(Statistics.getMotorTemperature()));
+            currentAmpereTextView.setText("" + df.format(Statistics.getCurrentAmpere()));
+            currentVoltageTextView.setText("" + df.format(Statistics.getCurrentVoltage()));
+            batteryLifeTextView.setText("" + Statistics.getBatteryLife());
+            currentBatteryCapTextView.setText("" + Statistics.getRemainingCapacity());
+
+            rangeMeter.setText("" + Statistics.getRemainingRange());
             spentPower.setText("spent: " + df.format(Statistics.getSpent()) + " Ah");
             recoveredPower.setText("recovered: " + df.format(Statistics.getRecovered()) + " Ah");
             statusTextView.setText("Response time: " + Statistics.getCurrDiff() + " ms");
-            batteryLifeTextView.setText(Statistics.getBatteryLife() + " %");
-            currentAmpereTextView.setText(Statistics.getCurrentAmpere() + " A");
-            voltageMeter.setText(Statistics.getCurrentVoltage() + " V");
-            battTemp.setText(Statistics.getBatteryTemperature() + " °C");
-            motorTemp.setText(Statistics.getMotorTemperature() + " °C");
-            currentBatteryCapTextView.setText(Statistics.getRemainingCapacity() + " mAh");
-            distance.setText(df1.format(Statistics.getDistanceTravelled()) + " km");
-            averageEfficiency.setText(df1.format(Statistics.getAverageEfficiency()) + " mAh/km");
-            averageSpeed.setText(df1.format(Statistics.getAverageSpeed()) + " km/h");
+            distance.setText(df.format(Statistics.getDistanceTravelled()) + " km");
+            averageEfficiency.setText(df.format(Statistics.getAverageEfficiency()) + " mAh/km");
+            averageSpeed.setText(df.format(Statistics.getAverageSpeed()) + " km/h");
             minPowerView.setText("min Power: " + (int) Statistics.getMinPower() + "W");
             maxPowerView.setText("max Power: " + (int) Statistics.getMaxPower() + "W");
             //minPowerView.setText("QueueD: " + Constants.QUEUE_DELAY + "ms");

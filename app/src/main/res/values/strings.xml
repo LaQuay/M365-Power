@@ -133,4 +133,11 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="scanning_automatically">Scanning BT Devices automatically…</string>
+    <string name="unit_km_h">km/h</string>
+    <string name="unit_watts">W</string>
+    <string name="unit_celsius">ºC</string>
+    <string name="unit_ampere">A</string>
+    <string name="unit_voltage">V</string>
+    <string name="unit_percent">%</string>
+    <string name="unit_m_ampere_h">mAh</string>
 </resources>
