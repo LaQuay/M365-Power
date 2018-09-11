@@ -30,47 +30,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
         android:orientation="vertical">
 
-        <LinearLayout
+        <laquay.M365.dashboard.component.DigitalTextView
+            android:id="@+id/tv_current_speed"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="10dp">
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            app:backgroundColor="@color/android_default_bg_color"
+            app:disableBackgroundImage="true"
+            app:showUnit="true"
+            app:unit="km/h"
+            app:unitTextColor="@color/md_blue_400"
+            app:unitTextSize="11dp"
+            app:value="30"
+            app:valueTextColor="@color/md_blue_500"
+            app:valueTextSize="38dp" />
 
-            <laquay.M365.dashboard.component.DigitalTextView
-                android:id="@+id/tv_current_speed"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                app:backgroundColor="@color/md_white_1000"
-                app:disableBackgroundImage="true"
-                app:showUnit="true"
-                app:unit="km/h"
-                app:unitTextColor="@color/md_blue_400"
-                app:unitTextSize="14dp"
-                app:value="30"
-                app:valueTextColor="@color/md_blue_500"
-                app:valueTextSize="30dp" />
-
-            <laquay.M365.dashboard.component.DigitalTextView
-                android:id="@+id/tv_current_power"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                app:backgroundColor="@color/md_white_1000"
-                app:disableBackgroundImage="true"
-                app:showUnit="true"
-                app:unit="w"
-                app:unitTextColor="@color/md_blue_400"
-                app:unitTextSize="14dp"
-                app:value="300"
-                app:valueTextColor="@color/md_blue_500"
-                app:valueTextSize="30dp" />
-        </LinearLayout>
+        <laquay.M365.dashboard.component.DigitalTextView
+            android:id="@+id/tv_current_power"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            app:backgroundColor="@color/android_default_bg_color"
+            app:disableBackgroundImage="true"
+            app:showUnit="true"
+            app:unit="watts"
+            app:unitTextColor="@color/md_blue_400"
+            app:unitTextSize="10dp"
+            app:value="300"
+            app:valueTextColor="@color/md_blue_500"
+            app:valueTextSize="34dp" />
     </LinearLayout>
 
     <LinearLayout

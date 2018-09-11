@@ -386,15 +386,13 @@ public class DeviceActivity extends AppCompatActivity
         DecimalFormat twoDecimals = new DecimalFormat("#.##");
         //update on each response
         runOnUiThread(() -> {
-            Log.e("SPEEDA", String.valueOf(Statistics.getCurrentSpeed()));
-            Log.e("SPEEDB", oneDecimals.format(Statistics.getCurrentSpeed()));
-            currentSpeedTextView.updateValue("" + oneDecimals.format(Statistics.getCurrentSpeed()));
+            currentSpeedTextView.updateValue("" + oneDecimals.format(Statistics.getCurrentSpeed()), true, true);
 
             double currentPower = Statistics.getPower();
             if (currentPower > 5.0 || currentPower < -5.0) {
-                currentPowerTextView.updateValue("" + noDecimals.format(currentPower));
+                currentPowerTextView.updateValue("" + noDecimals.format(currentPower), false, true);
             } else {
-                currentPowerTextView.updateValue("" + oneDecimals.format(currentPower));
+                currentPowerTextView.updateValue("" + oneDecimals.format(currentPower), true, true);
             }
             currentBatteryTemperatureTextView.setText("" + Statistics.getBatteryTemperature());
             currentMotorTemperatureTextView.setText("" + Statistics.getMotorTemperature());

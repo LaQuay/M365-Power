@@ -16,6 +16,7 @@ import android.widget.TextView;
 import laquay.M365.dashboard.R;
 
 public class DigitalTextView extends RelativeLayout {
+    private static final String TAG = DigitalTextView.class.getSimpleName();
     private String unit = "Km/h";
     private float speedTextSize = dpTOpx(40f);
     private float unitTextSize = dpTOpx(10f);
@@ -104,8 +105,34 @@ public class DigitalTextView extends RelativeLayout {
         mSpeedUnitTextView.setTextSize(unitTextSize);
     }
 
-    public void updateValue(String value) {
+    public void updateValue(String value, boolean showDot, boolean showAlwaysBgNegative) {
         this.value = value;
+
+        int numberOfBgElem = (value.length() == 1) ? 2 : value.length();
+        boolean containsDot = value.contains(".");
+        boolean containsNegative = value.contains("-");
+        String bgText = "";
+
+        if (containsDot) {
+            --numberOfBgElem;
+        }
+        if (containsNegative) {
+            --numberOfBgElem;
+        }
+
+        for (int i = 0; i < numberOfBgElem; ++i) {
+            bgText += "8";
+        }
+
+        if (containsDot || showDot) {
+            bgText += ".8";
+        }
+
+        if (containsNegative || showAlwaysBgNegative) {
+            bgText = "-" + bgText;
+        }
+
+        mSpeedBgTextView.setText("" + bgText);
         mSpeedTextView.setText("" + value);
     }
 

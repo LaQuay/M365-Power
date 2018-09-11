@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <color name="android_default_bg_color">#FAFAFA</color>
+
     <!-- bootstrap colours from 3.3.2 CSS -->
     <!--primary -->
     <color name="bootstrap_primary">#337ab7</color>
