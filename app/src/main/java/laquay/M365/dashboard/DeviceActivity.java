@@ -386,32 +386,33 @@ public class DeviceActivity extends AppCompatActivity
             }
         }
 
-        DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat oneDecimals = new DecimalFormat("#.#");
+        DecimalFormat twoDecimals = new DecimalFormat("#.##");
         //update on each response
         runOnUiThread(() -> {
             Log.e("SPEEDA", String.valueOf(Statistics.getCurrentSpeed()));
-            Log.e("SPEEDB", df.format(Statistics.getCurrentSpeed()));
-            currentSpeedTextView.setText("" + df.format(Statistics.getCurrentSpeed()));
-            currentPowerTextView.setText("" + df.format(Statistics.getPower()));
-            currentBatteryTemperatureTextView.setText("" + df.format(Statistics.getBatteryTemperature()));
-            currentMotorTemperatureTextView.setText("" + df.format(Statistics.getMotorTemperature()));
-            currentAmpereTextView.setText("" + df.format(Statistics.getCurrentAmpere()));
-            currentVoltageTextView.setText("" + df.format(Statistics.getCurrentVoltage()));
+            Log.e("SPEEDB", oneDecimals.format(Statistics.getCurrentSpeed()));
+            currentSpeedTextView.setText("" + oneDecimals.format(Statistics.getCurrentSpeed()));
+            currentPowerTextView.setText("" + oneDecimals.format(Statistics.getPower()));
+            currentBatteryTemperatureTextView.setText("" + Statistics.getBatteryTemperature());
+            currentMotorTemperatureTextView.setText("" + Statistics.getMotorTemperature());
+            currentAmpereTextView.setText("" + oneDecimals.format(Statistics.getCurrentAmpere()));
+            currentVoltageTextView.setText("" + oneDecimals.format(Statistics.getCurrentVoltage()));
             batteryLifeTextView.setText("" + Statistics.getBatteryLife());
             currentBatteryCapTextView.setText("" + Statistics.getRemainingCapacity());
 
             rangeMeter.setText("" + Statistics.getRemainingRange());
-            spentPower.setText("spent: " + df.format(Statistics.getSpent()) + " Ah");
-            recoveredPower.setText("recovered: " + df.format(Statistics.getRecovered()) + " Ah");
+            spentPower.setText("spent: " + oneDecimals.format(Statistics.getSpent()) + " Ah");
+            recoveredPower.setText("recovered: " + oneDecimals.format(Statistics.getRecovered()) + " Ah");
             statusTextView.setText("Response time: " + Statistics.getCurrDiff() + " ms");
-            distance.setText(df.format(Statistics.getDistanceTravelled()) + " km");
-            averageEfficiency.setText(df.format(Statistics.getAverageEfficiency()) + " mAh/km");
-            averageSpeed.setText(df.format(Statistics.getAverageSpeed()) + " km/h");
+            distance.setText(oneDecimals.format(Statistics.getDistanceTravelled()) + " km");
+            averageEfficiency.setText(oneDecimals.format(Statistics.getAverageEfficiency()) + " mAh/km");
+            averageSpeed.setText(oneDecimals.format(Statistics.getAverageSpeed()) + " km/h");
             minPowerView.setText("min Power: " + (int) Statistics.getMinPower() + "W");
             maxPowerView.setText("max Power: " + (int) Statistics.getMaxPower() + "W");
             //minPowerView.setText("QueueD: " + Constants.QUEUE_DELAY + "ms");
             //maxPowerView.setText("Req/Res: " + Statistics.getRequestsSent() + " " + Statistics.getResponseReceived());
-            efficiencyMeter.setText(Statistics.getMampHoursPerKilometer() + " mAh/Km");
+            efficiencyMeter.setText(Statistics.getmAmpHoursPerKilometer() + " mAh/Km");
         });
     }
 

@@ -6,47 +6,40 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Statistics {
+    private final static String TAG = Statistics.class.getSimpleName();
     private static int useAverageAsDefault = 0;
 
-    private static boolean loggingEnabled = true;
-
+    // Scooter settings
     private static boolean scooterLocked = false;
-
     private static boolean cruiseActive = false;
-
     private static boolean lightActive = false;
-
-    private static int recoveryMode = 0; //0=weak,1=medium,2=strong
-
+    private static int recoveryMode = 0; // 0=weak,1=medium,2=strong
     private static double maxPower = 0;
     private static double minPower = -0;
 
-    private static double recovered = 0.0; //Ampere hours
-    private static double spent = 0.0; //Ampere hours
-
-    private static double currentVoltage = 0.0;
-    private static double currentAmpere = 0.0;
-
+    // Statistical values
+    private static double recovered = 0.0; // A/h
+    private static double spent = 0.0; // A/h
     private static long lastTimeStamp;
     private static double currDiff;
-
     private static int requestsSent = 1;
     private static int responseReceived = 1;
 
+    // Current readings
+    private static double currentVoltage = 0.0;
+    private static double currentAmpere = 0.0;
+    private static double currentSpeed = 0.0; // km/h
     private static int batteryLife = 0;
-    private static int remainingCapacity = 7800; //Nennkapazität maH
+    private static int remainingCapacity = 7800; // maH
     private static int batteryTemperature = 0;
+    private static int motorTemperature = 0;
 
-    private static double motorTemperature = 0;
-
-    private static double distanceTravelled = 0.0001; //km
-    private static double currentSpeed = 0.0; //km/h
-
-    private static double mampHoursPerKilometer = 0.0;
-    private static int min_speed = 4;
-
-    private static int default_efficiency = 600;
     private static double remainingRange = 0.0;
+    private static double distanceTravelled = 0.0001; // km
+
+    private static double mAmpHoursPerKilometer = 0.0;
+    private static int min_speed = 4;
+    private static int default_efficiency = 600;
 
     private static ConcurrentSkipListSet<Double> currentList = new ConcurrentSkipListSet<>();
     private static ConcurrentSkipListSet<Double> speedList = new ConcurrentSkipListSet<>();
@@ -58,7 +51,7 @@ public class Statistics {
     }
 
     public static void setDefault_efficiency(int new_default_efficiency) {
-        Log.d("stat", "default:" + new_default_efficiency);
+        Log.d(TAG, "default_efficiency:" + new_default_efficiency);
         if (new_default_efficiency == -1) {
             new_default_efficiency = getAverageEfficiency();
             useAverageAsDefault = 1;
@@ -80,19 +73,11 @@ public class Statistics {
         Statistics.min_speed = min_speed;
     }
 
-    public static boolean isLoggingEnabled() {
-        return loggingEnabled;
-    }
-
-    public static void setLoggingEnabled(boolean loggingEnabled) {
-        loggingEnabled = loggingEnabled;
-    }
-
-    public static double getMotorTemperature() {
+    public static int getMotorTemperature() {
         return motorTemperature;
     }
 
-    public static void setMotorTemperature(double motorTemperature) {
+    public static void setMotorTemperature(int motorTemperature) {
         Statistics.motorTemperature = motorTemperature;
     }
 
@@ -130,23 +115,23 @@ public class Statistics {
         }
         //Log.d("Stat", "calculateEnergy: "+power+ " speed: "+currentSpeed);
         if (getCurrentSpeed() >= min_speed) {
-            mampHoursPerKilometer = ((power * 1000) / currentSpeed);
-            if (mampHoursPerKilometer < 0.01) {
-                mampHoursPerKilometer = 0.01;
+            mAmpHoursPerKilometer = ((power * 1000) / currentSpeed);
+            if (mAmpHoursPerKilometer < 0.01) {
+                mAmpHoursPerKilometer = 0.01;
             }
-            remainingRange = remainingCapacity / mampHoursPerKilometer;
+            remainingRange = remainingCapacity / mAmpHoursPerKilometer;
             if (remainingRange < 0.01) {
                 remainingRange = 0.0;
             }
-            efficiencyList.add(getMampHoursPerKilometer());
+            efficiencyList.add(getmAmpHoursPerKilometer());
         } else {
             if (useAverageAsDefault == 1) {
                 default_efficiency = getAverageEfficiency();
             } else if (useAverageAsDefault == 2) {
                 default_efficiency = getLimitedAverageEfficiency();
             }
-            mampHoursPerKilometer = default_efficiency;
-            remainingRange = remainingCapacity / mampHoursPerKilometer;
+            mAmpHoursPerKilometer = default_efficiency;
+            remainingRange = remainingCapacity / mAmpHoursPerKilometer;
         }
     }
 
@@ -335,8 +320,8 @@ public class Statistics {
         setMinPower(getPower());
     }
 
-    public static double getMampHoursPerKilometer() {
-        return round(mampHoursPerKilometer, 2);
+    public static double getmAmpHoursPerKilometer() {
+        return round(mAmpHoursPerKilometer, 2);
     }
 
     public static double getRemainingRange() {
@@ -370,7 +355,7 @@ public class Statistics {
         logDTO.setRemainingCapacity(getRemainingCapacity());
         logDTO.setDistanceTravelled(getDistanceTravelled());
         logDTO.setBattTemp(getBatteryTemperature());
-        logDTO.setMampHoursPerKilometer(getMampHoursPerKilometer());
+        logDTO.setMampHoursPerKilometer(getmAmpHoursPerKilometer());
         logDTO.setRemainingRange(getRemainingRange());
         logDTO.setTimestamp(lastTimeStamp);
 
@@ -384,9 +369,6 @@ public class Statistics {
         return (double) temp / Math.pow(10, decimals);
     }
 
-    public static void activateLogging(boolean enable) {
-        setLoggingEnabled(enable);
-    }
 
     public static boolean isScooterLocked() {
         return scooterLocked;

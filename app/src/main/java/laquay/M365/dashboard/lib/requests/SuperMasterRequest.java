@@ -45,7 +45,7 @@ public class SuperMasterRequest implements IRequest {
 
         int temperature = (short) Integer.parseInt(tempTemperature, 16);
         double temp = temperature / 10.0;
-        Statistics.setMotorTemperature(temp);
+        Statistics.setMotorTemperature((int) temp);
 
         return v + ""; // TODO ???
     }

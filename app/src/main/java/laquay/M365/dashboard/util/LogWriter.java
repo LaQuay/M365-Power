@@ -18,10 +18,19 @@ public class LogWriter {
     private List<LogDTO> dtoList;
     private StringBuilder allBuilder;
     private String path;
+    private static boolean loggingEnabled = true;
 
     public LogWriter() {
         this.dtoList = new ArrayList<>();
         allBuilder = new StringBuilder();
+    }
+
+    public static boolean isLoggingEnabled() {
+        return loggingEnabled;
+    }
+
+    public static void setLoggingEnabled(boolean loggingEnabled) {
+        LogWriter.loggingEnabled = loggingEnabled;
     }
 
     public void writeLog(boolean all) {
@@ -80,13 +89,11 @@ public class LogWriter {
 
     //https://tools.ietf.org/html/rfc4180
     private String followCVSformat(String value) {
-
         String result = value;
         if (result.contains("\"")) {
             result = result.replace("\"", "\"\"");
         }
         return result;
-
     }
 
     private String writeLine(List<String> values, char separators, char customQuote) {

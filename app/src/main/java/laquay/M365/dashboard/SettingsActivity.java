@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import java.util.List;
 
 import laquay.M365.dashboard.lib.Statistics;
+import laquay.M365.dashboard.util.LogWriter;
 
 public class SettingsActivity extends PreferenceActivity {
 
@@ -54,7 +55,7 @@ public class SettingsActivity extends PreferenceActivity {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
                 SwitchPreference listPreference = (SwitchPreference) preference;
-                Statistics.activateLogging(listPreference.isEnabled());
+                LogWriter.setLoggingEnabled(listPreference.isEnabled());
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
