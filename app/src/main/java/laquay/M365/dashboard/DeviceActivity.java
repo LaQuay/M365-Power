@@ -282,14 +282,13 @@ public class DeviceActivity extends AppCompatActivity
         }
 
         String requestBit = hexString[5];
-
         if (bytes.length > 10) { //Super handling
             if (requestBit.equals(requestTypes.get(RequestType.SUPERMASTER).getRequestBit())) {
                 lastResponse = hexString;
-                Statistics.countRespnse();
+                Statistics.countResponse();
                 return;
             } else if (requestBit.equals(requestTypes.get(RequestType.SUPERBATTERY).getRequestBit())) {
-                Statistics.countRespnse();
+                Statistics.countResponse();
                 Long now = System.nanoTime();
                 double diff = now - lastTimeStamp;
                 diff /= 1000000;
@@ -299,18 +298,13 @@ public class DeviceActivity extends AppCompatActivity
                 Log.d(TAG, "statusTextView in ms:" + diff);
                 requestTypes.get(RequestType.SUPERBATTERY).handleResponse(hexString);
             } else {
-                String[] combinedRespose = new String[lastResponse.length + hexString.length];
-                System.arraycopy(lastResponse, 0, combinedRespose, 0, lastResponse.length);
-                System.arraycopy(hexString, 0, combinedRespose, lastResponse.length, hexString.length);
-                String speed = requestTypes.get(RequestType.SUPERMASTER).handleResponse(combinedRespose);
-                for (SpecialTextView f : textViews) {
-                    if (f.getType() == RequestType.SPEED) {
-                        runOnUiThread(() -> f.setText(speed));
-                    }
-                }
+                String[] combinedResponse = new String[lastResponse.length + hexString.length];
+                System.arraycopy(lastResponse, 0, combinedResponse, 0, lastResponse.length);
+                System.arraycopy(hexString, 0, combinedResponse, lastResponse.length, hexString.length);
+                requestTypes.get(RequestType.SUPERMASTER).handleResponse(combinedResponse);
             }
         } else {
-            Statistics.countRespnse();
+            Statistics.countResponse();
             for (IRequest e : requestTypes.values()) {
                 if (e.getRequestBit().equals(requestBit)) {
                     String temp = e.handleResponse(hexString);
@@ -386,6 +380,7 @@ public class DeviceActivity extends AppCompatActivity
             }
         }
 
+        DecimalFormat noDecimals = new DecimalFormat("#");
         DecimalFormat oneDecimals = new DecimalFormat("#.#");
         DecimalFormat twoDecimals = new DecimalFormat("#.##");
         //update on each response
@@ -393,7 +388,13 @@ public class DeviceActivity extends AppCompatActivity
             Log.e("SPEEDA", String.valueOf(Statistics.getCurrentSpeed()));
             Log.e("SPEEDB", oneDecimals.format(Statistics.getCurrentSpeed()));
             currentSpeedTextView.setText("" + oneDecimals.format(Statistics.getCurrentSpeed()));
-            currentPowerTextView.setText("" + oneDecimals.format(Statistics.getPower()));
+
+            double currentPower = Statistics.getPower();
+            if (currentPower > 5.0 || currentPower < -5.0) {
+                currentPowerTextView.setText("" + noDecimals.format(currentPower));
+            } else {
+                currentPowerTextView.setText("" + oneDecimals.format(currentPower));
+            }
             currentBatteryTemperatureTextView.setText("" + Statistics.getBatteryTemperature());
             currentMotorTemperatureTextView.setText("" + Statistics.getMotorTemperature());
             currentAmpereTextView.setText("" + oneDecimals.format(Statistics.getCurrentAmpere()));
@@ -494,7 +495,6 @@ public class DeviceActivity extends AppCompatActivity
         }
     }
 
-    //------MENU------
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
@@ -560,7 +560,7 @@ public class DeviceActivity extends AppCompatActivity
             }
             return true;
         }
-        //fillCheckFirstList();
+        checkFirst();
         return super.onOptionsItemSelected(item);
     }
 

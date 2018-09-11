@@ -237,7 +237,7 @@ public class Statistics {
         return spent;
     }
 
-    public static void countRespnse() {
+    public static void countResponse() {
         responseReceived += 1;
     }
 
