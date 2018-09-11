@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DigitalTextView">
+        <attr name="valueTextColor" format="color" />
+        <attr name="unitTextColor" format="color" />
+        <attr name="backgroundColor" format="color" />
+        <attr name="valueTextSize" format="dimension" />
+        <attr name="unitTextSize" format="dimension" />
+        <attr name="unit" format="string" />
+        <attr name="value" format="string" />
+        <attr name="backgroundDrawable" format="integer" />
+        <attr name="disableBackgroundImage" format="boolean" />
+        <attr name="showUnit" format="boolean" />
+    </declare-styleable>
+</resources>

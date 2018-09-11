@@ -30,6 +30,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import laquay.M365.dashboard.component.DigitalTextView;
 import laquay.M365.dashboard.component.SpecialTextView;
 import laquay.M365.dashboard.device.DeviceManager;
 import laquay.M365.dashboard.device.ResponseCallback;
@@ -72,8 +73,8 @@ public class DeviceActivity extends AppCompatActivity
     private SpecialTextView currentVoltageTextView;
     private SpecialTextView currentAmpereTextView;
     private SpecialTextView batteryLifeTextView;
-    private SpecialTextView currentSpeedTextView;
-    private TextView currentPowerTextView;
+    private DigitalTextView currentSpeedTextView;
+    private DigitalTextView currentPowerTextView;
     private TextView minPowerView;
     private TextView maxPowerView;
     private TextView efficiencyMeter;
@@ -203,8 +204,8 @@ public class DeviceActivity extends AppCompatActivity
         textViews.add(currentAmpereTextView);
 
         currentSpeedTextView = findViewById(R.id.tv_current_speed);
-        currentSpeedTextView.setType(RequestType.SPEED);
-        textViews.add(currentSpeedTextView);
+        //currentSpeedTextView.setType(RequestType.SPEED);
+        //textViews.add(currentSpeedTextView);
 
         currentPowerTextView = findViewById(R.id.tv_current_power);
         minPowerView = findViewById(R.id.minPowerView);
@@ -387,13 +388,13 @@ public class DeviceActivity extends AppCompatActivity
         runOnUiThread(() -> {
             Log.e("SPEEDA", String.valueOf(Statistics.getCurrentSpeed()));
             Log.e("SPEEDB", oneDecimals.format(Statistics.getCurrentSpeed()));
-            currentSpeedTextView.setText("" + oneDecimals.format(Statistics.getCurrentSpeed()));
+            currentSpeedTextView.updateValue("" + oneDecimals.format(Statistics.getCurrentSpeed()));
 
             double currentPower = Statistics.getPower();
             if (currentPower > 5.0 || currentPower < -5.0) {
-                currentPowerTextView.setText("" + noDecimals.format(currentPower));
+                currentPowerTextView.updateValue("" + noDecimals.format(currentPower));
             } else {
-                currentPowerTextView.setText("" + oneDecimals.format(currentPower));
+                currentPowerTextView.updateValue("" + oneDecimals.format(currentPower));
             }
             currentBatteryTemperatureTextView.setText("" + Statistics.getBatteryTemperature());
             currentMotorTemperatureTextView.setText("" + Statistics.getMotorTemperature());

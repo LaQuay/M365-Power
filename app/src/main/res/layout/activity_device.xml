@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
@@ -38,41 +39,37 @@
             android:orientation="horizontal"
             android:padding="10dp">
 
-            <laquay.M365.dashboard.component.SpecialTextView
+            <laquay.M365.dashboard.component.DigitalTextView
                 android:id="@+id/tv_current_speed"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:gravity="end"
-                android:text="0"
-                android:textSize="56sp" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="6dp"
                 android:layout_weight="1"
-                android:gravity="bottom"
-                android:text="@string/unit_km_h"
-                android:textSize="24sp" />
+                android:gravity="center"
+                app:backgroundColor="@color/md_white_1000"
+                app:disableBackgroundImage="true"
+                app:showUnit="true"
+                app:unit="km/h"
+                app:unitTextColor="@color/md_blue_400"
+                app:unitTextSize="14dp"
+                app:value="30"
+                app:valueTextColor="@color/md_blue_500"
+                app:valueTextSize="30dp" />
 
-            <TextView
+            <laquay.M365.dashboard.component.DigitalTextView
                 android:id="@+id/tv_current_power"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:gravity="end"
-                android:text="0"
-                android:textSize="48sp" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="7dp"
                 android:layout_weight="1"
-                android:gravity="bottom"
-                android:text="@string/unit_watts"
-                android:textSize="24sp" />
+                android:gravity="center"
+                app:backgroundColor="@color/md_white_1000"
+                app:disableBackgroundImage="true"
+                app:showUnit="true"
+                app:unit="w"
+                app:unitTextColor="@color/md_blue_400"
+                app:unitTextSize="14dp"
+                app:value="300"
+                app:valueTextColor="@color/md_blue_500"
+                app:valueTextSize="30dp" />
         </LinearLayout>
     </LinearLayout>
 
